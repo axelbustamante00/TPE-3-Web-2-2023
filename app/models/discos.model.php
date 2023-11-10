@@ -43,7 +43,7 @@ class DiscosModel extends Model {
     *
     *           ESTOS DOS METODOS SON PARA LUEGO HACER EL PUNTO DE FILTRADO    
     *
-    *
+    */
     public function getDiscosFiltradosPorArtista($artistaDeseado){
         $query = $this->db->prepare("SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist WHERE artistas.artist_name = '$artistaDeseado'");
         $query->execute();
@@ -51,13 +51,13 @@ class DiscosModel extends Model {
         return $discos;
     }
 
-    public function getSelectedAlbums(){
-        $query = $this->db->prepare('SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist WHERE discos.selected = 1');
-        $query->execute();
+    public function getSelectedAlbums($selected){
+        $query = $this->db->prepare('SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist WHERE discos.selected = ?');
+        $query->execute([$selected]);
         $albums = $query->fetchAll(PDO::FETCH_OBJ);
         return $albums;
     }
-    */
+    
 
     public function updateAlbumData($id, $album_name, $release_date, $id_artist, $duration){
         $query = $this->db->prepare('UPDATE discos SET album_name = ?, release_date = ?, id_artist = ?, duration = ? WHERE id_album = ?');
@@ -66,8 +66,8 @@ class DiscosModel extends Model {
     }
 
     public function getAlbumsOrdenados($ordenador, $orden){
-        $query = $this->db->prepare('SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist ORDER BY ? ?');
-        $query->execute([$ordenador, $orden]);
+        $query = $this->db->prepare('SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist ORDER BY '.$ordenador.' '.$orden);
+        $query->execute();
         $albums = $query->fetchAll(PDO::FETCH_OBJ);
         return $albums;
     }

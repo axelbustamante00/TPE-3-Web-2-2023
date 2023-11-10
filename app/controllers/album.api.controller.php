@@ -13,12 +13,71 @@
         //GET
         function get($params = []) {
             if (empty($params)){
-                //Doy la opción de mostrar discos ordenados por duracion
+                //Doy la opción de mostrar discos ordenados por cada campo de la tabla
                 if(isset($_GET['sort'])&&(isset($_GET['order']))){                    
                     $ordenador = $_GET['sort'];
-                    $orden = $_GET['order'];                    
-                    $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                    $this->view->response($discos, 200);                        
+                    $orden = $_GET['order']; 
+                    switch ($ordenador) {
+                        case 'id_album':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        case 'album_name':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        case 'release_date':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        case 'id_artist':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        case 'duration':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        case 'selected':
+                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($discos, 200);
+                            break;
+                        default:
+                            $this->view->response(
+                            'La tabla no posee tal campo.'
+                            , 404);
+                            break;
+                    }                                            
+                }
+                //Permito filtrar por artista
+                else if(isset($_GET['artista'])){
+                    $artistaDeseado = $_GET['artista'];
+                    $discos = $this->model->getDiscosFiltradosPorArtista($artistaDeseado);
+                    if($discos)
+                        $this->view->response($discos, 200);
+                    else
+                    $this->view->response('El artista ingresado no existe.', 404);        
+                }
+                //Permito filtrar por seleccionados y no seleccionados
+                else if (isset($_GET['selected'])){
+                    $selected=$_GET['selected'];
+                    if($selected==1){
+                        $discos = $this->model->getSelectedAlbums($selected);
+                        if($discos)
+                            $this->view->response($discos, 200);
+                        else
+                        $this->view->response('No existen discos seleccionados.', 404);
+                    }
+                    else if($selected==0){
+                        $discos = $this->model->getSelectedAlbums($selected);
+                        if($discos)
+                            $this->view->response($discos, 200);
+                        else
+                        $this->view->response('No existen discos no seleccionados.', 404);
+                    }
+                    else{
+                        $this->view->response('El valor del parámetro es incorrecto.', 404);
+                    }
                 }
                 else{
                     $discos = $this->model->getAlbums();
