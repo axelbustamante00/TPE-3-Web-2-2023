@@ -7,10 +7,10 @@
     $router = new Router();
 
     #                 endpoint      verbo     controller           método
-    $router->addRoute('discos',     'GET',    'AlbumApiController', 'get'   ); # AlbumApiController->get($params)
-    $router->addRoute('discos',     'POST',   'AlbumApiController', 'create');
-    $router->addRoute('discos/:ID', 'GET',    'AlbumApiController', 'get'   );
-    $router->addRoute('discos/:ID', 'PUT',    'AlbumApiController', 'update');
-    $router->addRoute('discos/:ID', 'DELETE', 'AlbumApiController', 'delete');
+    $router->addRoute('albums',     'GET',    'AlbumApiController', 'get'   ); # AlbumApiController->get($params)
+    $router->addRoute('albums',     'POST',   'AlbumApiController', 'create');
+    $router->addRoute('albums/:ID', 'GET',    'AlbumApiController', 'get'   );
+    $router->addRoute('albums/:ID', 'PUT',    'AlbumApiController', 'update');
+    $router->addRoute('albums/:ID', 'DELETE', 'AlbumApiController', 'delete');
     
     $router->route($_GET['resource']        , $_SERVER['REQUEST_METHOD']);
