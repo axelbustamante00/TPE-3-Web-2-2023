@@ -10,12 +10,11 @@ class DiscosModel extends Model {
     public function getAlbums(){
         $query = $this->db->prepare('SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist');
         $query->execute();
-        $albums = $query->fetchAll(PDO::FETCH_OBJ);
+        $albums = $query->fetchAll(PDO::FETCH_ASSOC);
         return $albums;
     }
 
-    public function insertAlbum($album_name, $release_date, $id_artist, $duration){
-    
+    public function insertAlbum($album_name, $release_date, $id_artist, $duration){    
         $query = $this->db->prepare('INSERT INTO discos (album_name, release_date, id_artist, duration) VALUES (?,?,?,?)');
         $query->execute([$album_name, $release_date, $id_artist, $duration]);
         return $this->db->lastInsertId();
@@ -38,12 +37,6 @@ class DiscosModel extends Model {
         return $disco;
     }
 
-
-    /*  
-    *
-    *           ESTOS DOS METODOS SON PARA LUEGO HACER EL PUNTO DE FILTRADO    
-    *
-    */
     public function getDiscosFiltradosPorArtista($artistaDeseado){
         $query = $this->db->prepare("SELECT discos.*, artistas.artist_name as artist_name FROM discos JOIN artistas ON discos.id_artist = artistas.id_artist WHERE artistas.artist_name = '$artistaDeseado'");
         $query->execute();

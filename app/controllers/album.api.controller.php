@@ -10,6 +10,15 @@
             $this->model = new DiscosModel();
         }
 
+        //Con esta función busco si el parametro ingresado coincide con una de las columnas de la tabla
+        function verificarParametro($parametro) {
+            //Pido los discos para buscar los nombres de las columnas 
+            $discos = $this->model->getAlbums();
+            //Tomo solo el primero para optimizar un poco la búsqueda
+            $disco=$discos[0];
+            return array_key_exists($parametro, $disco);      
+        }
+
         //GET
         function get($params = []) {
             if (empty($params)){
@@ -17,37 +26,22 @@
                 if(isset($_GET['sort'])&&(isset($_GET['order']))){                    
                     $ordenador = $_GET['sort'];
                     $orden = $_GET['order']; 
-                    switch ($ordenador) {
-                        case 'id_album':
+                    //controlo que lo ingresado en $ordenador sea una de las columnas
+                    if ($this->verificarParametro($ordenador)){
+                        //verifico si $orden esta correctamente ingresado
+                        if($orden=='asc'||$orden=='desc'||$orden=='ASC'||$orden=='DESC'){
                             $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
                             $this->view->response($discos, 200);
-                            break;
-                        case 'album_name':
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
-                            break;
-                        case 'release_date':
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
-                            break;
-                        case 'id_artist':
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
-                            break;
-                        case 'duration':
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
-                            break;
-                        case 'selected':
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
-                            break;
-                        default:
-                            $this->view->response(
+                        }
+                        else{
+                            $this->view->response('El valor del parámetro order es incorrecto.', 400);
+                        }
+                    }
+                    else{
+                        $this->view->response(
                             'La tabla no posee tal campo.'
                             , 404);
-                            break;
-                    }                                            
+                    }                                     
                 }
                 //Permito filtrar por artista
                 else if(isset($_GET['artista'])){
@@ -76,7 +70,7 @@
                         $this->view->response('No existen discos no seleccionados.', 404);
                     }
                     else{
-                        $this->view->response('El valor del parámetro es incorrecto.', 404);
+                        $this->view->response('El valor del parámetro es incorrecto.', 400);
                     }
                 }
                 else{
@@ -84,7 +78,7 @@
                     $this->view->response($discos, 200);                        
                 }
             } 
-            else {
+            else{
                 $disco = $this->model->getDiscoById($params[':ID']);
                 if(!empty($disco)) {
                     $this->view->response($disco, 200);
