@@ -1,28 +1,28 @@
 <?php
     require_once 'app/controllers/api.controller.php';
-    require_once 'app/models/discos.model.php';
+    require_once 'app/models/albums.model.php';
 
     class AlbumApiController extends ApiController {
         private $model;
 
         function __construct() {
             parent::__construct();
-            $this->model = new DiscosModel();
+            $this->model = new AlbumsModel();
         }
 
         //Con esta función busco si el parametro ingresado coincide con una de las columnas de la tabla
         function verificarParametro($parametro) {
-            //Pido los discos para buscar los nombres de las columnas 
-            $discos = $this->model->getAlbums();
+            //Pido los albums para buscar los nombres de las columnas 
+            $albums = $this->model->getAlbums();
             //Tomo solo el primero para optimizar un poco la búsqueda
-            $disco=$discos[0];
-            return array_key_exists($parametro, $disco);      
+            $album=$albums[0];
+            return array_key_exists($parametro, $album);      
         }
 
         //GET
         function get($params = []) {
             if (empty($params)){
-                //Doy la opción de mostrar discos ordenados por cada campo de la tabla
+                //Doy la opción de mostrar albums ordenados por cada campo de la tabla
                 if(isset($_GET['sort'])&&(isset($_GET['order']))){                    
                     $ordenador = $_GET['sort'];
                     $orden = $_GET['order']; 
@@ -30,8 +30,8 @@
                     if ($this->verificarParametro($ordenador)){
                         //verifico si $orden esta correctamente ingresado
                         if($orden=='asc'||$orden=='desc'||$orden=='ASC'||$orden=='DESC'){
-                            $discos = $this->model->getAlbumsOrdenados($ordenador, $orden);
-                            $this->view->response($discos, 200);
+                            $albums = $this->model->getAlbumsOrdenados($ordenador, $orden);
+                            $this->view->response($albums, 200);
                         }
                         else{
                             $this->view->response('El valor del parámetro order es incorrecto.', 400);
@@ -46,9 +46,9 @@
                 //Permito filtrar por artista
                 else if(isset($_GET['artista'])){
                     $artistaDeseado = $_GET['artista'];
-                    $discos = $this->model->getDiscosFiltradosPorArtista($artistaDeseado);
-                    if($discos)
-                        $this->view->response($discos, 200);
+                    $albums = $this->model->getAlbumsFiltradosPorArtista($artistaDeseado);
+                    if($albums)
+                        $this->view->response($albums, 200);
                     else
                     $this->view->response('El artista ingresado no existe.', 404);        
                 }
@@ -56,36 +56,36 @@
                 else if (isset($_GET['selected'])){
                     $selected=$_GET['selected'];
                     if($selected==1){
-                        $discos = $this->model->getSelectedAlbums($selected);
-                        if($discos)
-                            $this->view->response($discos, 200);
+                        $albums = $this->model->getSelectedAlbums($selected);
+                        if($albums)
+                            $this->view->response($albums, 200);
                         else
-                        $this->view->response('No existen discos seleccionados.', 404);
+                        $this->view->response('No existen albums seleccionados.', 404);
                     }
                     else if($selected==0){
-                        $discos = $this->model->getSelectedAlbums($selected);
-                        if($discos)
-                            $this->view->response($discos, 200);
+                        $albums = $this->model->getSelectedAlbums($selected);
+                        if($albums)
+                            $this->view->response($albums, 200);
                         else
-                        $this->view->response('No existen discos no seleccionados.', 404);
+                        $this->view->response('No existen albums no seleccionados.', 404);
                     }
                     else{
                         $this->view->response('El valor del parámetro es incorrecto.', 400);
                     }
                 }
                 else{
-                    $discos = $this->model->getAlbums();
-                    $this->view->response($discos, 200);                        
+                    $albums = $this->model->getAlbums();
+                    $this->view->response($albums, 200);                        
                 }
             } 
             else{
-                $disco = $this->model->getDiscoById($params[':ID']);
-                if(!empty($disco)) {
-                    $this->view->response($disco, 200);
+                $album = $this->model->getAlbumById($params[':ID']);
+                if(!empty($album)) {
+                    $this->view->response($album, 200);
                 } 
                 else {
                     $this->view->response(
-                        'El disco con el id='.$params[':ID'].' no existe.'
+                        'El album con el id='.$params[':ID'].' no existe.'
                         , 404);
                 }
             }
@@ -94,12 +94,12 @@
         //DELETE
         function delete($params = []) {
             $id = $params[':ID'];
-            $disco = $this->model->getDiscoById($id);
-            if($disco) {
+            $album = $this->model->getAlbumById($id);
+            if($album) {
                 $this->model->deleteAlbum($id);
-                $this->view->response('El disco '.$disco[0]->album_name.' de '.$disco[0]->artist_name.' con id='.$id.' ha sido borrado.', 200);
+                $this->view->response('El album '.$album[0]->album_name.' de '.$album[0]->artist_name.' con id='.$id.' ha sido borrado.', 200);
             } else {
-                $this->view->response('El disco con id='.$id.' no existe.', 404);
+                $this->view->response('El album con id='.$id.' no existe.', 404);
             }
         }
 
@@ -115,11 +115,11 @@
             if (empty($album_name) || empty($release_date) || empty($id_artist) || empty($duration)) {
                 $this->view->response("Complete los datos", 400);
             } else {
-                //creo el disco
+                //creo el album
                 $id = $this->model->insertAlbum($album_name, $release_date, $id_artist, $duration);
                 // devuelvo el recurso creado
-                $disco = $this->model->getDiscoById($id);
-                $this->view->response($disco, 201);
+                $album = $this->model->getAlbumById($id);
+                $this->view->response($album, 201);
             }
     
         }
@@ -127,9 +127,9 @@
         //PUT
         function update($params = []) {
             $id = $params[':ID'];
-            $disco = $this->model->getDiscoById($id);
+            $album = $this->model->getAlbumById($id);
 
-            if($disco) {
+            if($album) {
                 $body = $this->getData();
                 $album_name = $body->album_name;
                 $release_date = $body->release_date;
@@ -138,13 +138,13 @@
 
                 $this->model->updateAlbumData($id, $album_name, $release_date, $id_artist, $duration);
 
-                $this->view->response('El disco '.$disco[0]->album_name.' de '.$disco[0]->artist_name.' con id='.$id.' ha sido modificado.', 200);
-                //Pido el disco actualizado para mostrarlo
-                $disco = $this->model->getDiscoById($id);
-                //Muestro el disco editado ya que me resulta mejor para la experiencia de usuario
-                $this->view->response($disco, 201);
+                $this->view->response('El album '.$album[0]->album_name.' de '.$album[0]->artist_name.' con id='.$id.' ha sido modificado.', 200);
+                //Pido el album actualizado para mostrarlo
+                $album = $this->model->getAlbumById($id);
+                //Muestro el album editado ya que me resulta mejor para la experiencia de usuario
+                $this->view->response($album, 201);
             } else {
-                $this->view->response('El disco con id='.$id.' no existe.', 404);
+                $this->view->response('El album con id='.$id.' no existe.', 404);
             }
         }
     }
